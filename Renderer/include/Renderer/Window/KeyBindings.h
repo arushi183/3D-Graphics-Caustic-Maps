@@ -1,0 +1,134 @@
+#pragma once
+
+namespace window
+{
+
+	class KEY
+	{
+	public:
+		static int SPACE;
+		static int APOSTROPHE;
+		static int COMMA;
+		static int MINUS;
+		static int PERIOD;
+		static int FORWARDSLASH;
+		static int NUM_0;
+		static int NUM_1;
+		static int NUM_2;
+		static int NUM_3;
+		static int NUM_4;
+		static int NUM_5;
+		static int NUM_6;
+		static int NUM_7;
+		static int NUM_8;
+		static int NUM_9;
+		static int SEMICOLON;
+		static int EQUAL;
+		static int A;
+		static int B;
+		static int C;
+		static int D;
+		static int E;
+		static int F;
+		static int G;
+		static int H;
+		static int I;
+		static int J;
+		static int K;
+		static int L;
+		static int M;
+		static int N;
+		static int O;
+		static int P;
+		static int Q;
+		static int R;
+		static int S;
+		static int T;
+		static int U;
+		static int V;
+		static int W;
+		static int X;
+		static int Y;
+		static int Z;
+		static int LEFT_BRACKET;
+		static int BACKSLASH;
+		static int RIGHT_BRACKET;
+		static int GRAVE_ACCENT;
+		static int ESCAPE;
+		static int ENTER;
+		static int TAB;
+		static int BACKSPACE;
+		static int INSERT;
+		static int DELETE;
+		static int RIGHT;
+		static int LEFT;
+		static int DOWN;
+		static int UP;
+
+		static int PAGE_UP;
+		static int PAGE_DOWN;
+		static int HOME;
+		static int END;
+		static int CAPS_LOCK;
+		static int SCROLL_LOCK;
+		static int NUM_LOCK;
+		static int PRINT_SCREEN;
+		static int PAUSE;
+		static int F1;
+		static int F2;
+		static int F3;
+		static int F4;
+		static int F5;
+		static int F6;
+		static int F7;
+		static int F8;
+		static int F9;
+		static int F10;
+		static int F11;
+		static int F12;
+		static int F13;
+		static int F14;
+		static int F15;
+		static int F16;
+		static int F17;
+		static int F18;
+		static int F19;
+		static int F20;
+		static int F21;
+		static int F22;
+		static int F23;
+		static int F24;
+		static int F25;
+		static int KP_NUM_0;
+		static int KP_NUM_1;
+		static int KP_NUM_2;
+		static int KP_NUM_3;
+		static int KP_NUM_4;
+		static int KP_NUM_5;
+		static int KP_NUM_6;
+		static int KP_NUM_7;
+		static int KP_NUM_8;
+		static int KP_NUM_9;
+		static int KP_DECIMAL;
+		static int KP_DIVIDE;
+		static int KP_MULTIPLY;
+		static int KP_SUBTRACT;
+		static int KP_ADD;
+		static int KP_ENTER;
+		static int KP_EQUAL;
+		static int LEFT_SHIFT;
+		static int LEFT_CONTROL;
+		static int LEFT_ALT;
+		static int LEFT_SUPER;
+		static int RIGHT_SHIFT;
+		static int RIGHT_CONTROL;
+		static int RIGHT_ALT;
+		static int RIGHT_SUPER;
+		static int MENU;
+
+		static int MOUSE_L;
+		static int MOUSE_R;
+		static int MOUSE_M;
+	};
+
+}
