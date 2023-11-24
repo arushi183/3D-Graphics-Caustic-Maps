@@ -1,0 +1,7 @@
+﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(502,5): warning MSB8004: Intermediate Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Intermediate Directory.
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(503,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
+  Mesh.cpp
+D:\Projects\3D-Renderer\Renderer\src\Graphics\Mesh.cpp(26,21): warning C4018: '<': signed/unsigned mismatch
+D:\Projects\3D-Renderer\Renderer\src\Graphics\Mesh.cpp(30,134): warning C4312: 'type cast': conversion from 'unsigned int' to 'void *' of greater size
+assimp.lib(assimp-vc142-mt.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in opengl32.lib(OPENGL32.dll); second definition ignored
+  Renderer.vcxproj -> D:\Projects\3D-Renderer\bin\Debug\Renderer\Renderer.lib
