@@ -19,10 +19,16 @@ namespace renderer
 		FuncPtr frameupdateCallback = [this](unsigned int a, unsigned int b) { updateFrameBufferResolution(a, b); };
 		window->addSizeCallback(frameupdateCallback);
 		
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
 
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+
+		glEnable(GL_LINE_WIDTH);
+		glLineWidth(2);
 	}
 
 	Renderer::~Renderer()
@@ -33,6 +39,13 @@ namespace renderer
 	{
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+	}
+
+	void Renderer::renderLine(unsigned int VAO, int elementCount)
+	{
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_LINES, 0, elementCount);
 		glBindVertexArray(0);
 	}
 

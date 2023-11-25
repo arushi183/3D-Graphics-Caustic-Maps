@@ -10,16 +10,23 @@ namespace renderer
 	{
 	public:
 		ColorPass(graphics::Scene* scene, Renderer* renderer);
+		~ColorPass();
 
 		void preRender() override;
 		void render() override;
 		void postRender() override;
 
-		void setInputs() override;
-		void getOutputs() override;
+		void setInputs(RenderPass* pass) override;
+		void getOutputs(void* inputStruct) override;
 	private:
 		graphics::Scene* m_scene;
+		graphics::Shader* m_lineShader;
 		int m_viewportHeight, m_viewportWidth;
+		unsigned int m_ColorFBO;
+		unsigned int m_RBO;
+		graphics::Texture* m_colorTexture;
+
+		std::unordered_map<graphics::Light*, graphics::Texture*> m_shadowStruct;
 	};
 
 }

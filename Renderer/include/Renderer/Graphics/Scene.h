@@ -5,11 +5,10 @@
 
 #include "Renderable.h"
 #include "Camera.h"
+#include "Light.h"
 
 namespace graphics
 {
-	class Light;
-
 	struct Scene
 	{
 	public:

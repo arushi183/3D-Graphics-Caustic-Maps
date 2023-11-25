@@ -12,8 +12,8 @@ namespace renderer
 		virtual void render() = 0;
 		virtual void postRender() = 0;
 
-		virtual void setInputs() = 0;
-		virtual void getOutputs() = 0;
+		virtual void setInputs(RenderPass* pass) = 0;
+		virtual void getOutputs(void* inputStruct) = 0;
 	protected:
 		Renderer* m_renderer;
 	};

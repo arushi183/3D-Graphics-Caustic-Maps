@@ -16,6 +16,8 @@ d:\projects\3d-renderer\bin-int\debug\renderer\scene.obj
 d:\projects\3d-renderer\bin-int\debug\renderer\mesh.obj
 d:\projects\3d-renderer\bin-int\debug\renderer\model.obj
 d:\projects\3d-renderer\bin-int\debug\renderer\camera.obj
+d:\projects\3d-renderer\bin-int\debug\renderer\directionallight.obj
+d:\projects\3d-renderer\bin-int\debug\renderer\directionalshadowpass.obj
 d:\projects\3d-renderer\bin\debug\renderer\renderer.lib
 d:\projects\3d-renderer\bin-int\debug\renderer\renderer.vcxproj.filelistabsolute.txt
 d:\projects\3d-renderer\bin-int\debug\renderer\renderer.tlog\cl.command.1.tlog

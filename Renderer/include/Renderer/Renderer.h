@@ -11,6 +11,7 @@ namespace renderer
         ~Renderer();
 
         void render(unsigned int VAO, int elementCount);
+        void renderLine(unsigned int VAO, int elementCount);
     private:
         int m_framebuffer_width, m_framebuffer_height;
 

@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Renderer\RenderPipeline\DirectionalShadowPass.h" />
+    <ClInclude Include="include\Renderer\Graphics\DirectionalLight.h" />
     <ClInclude Include="include\Renderer\Graphics\Camera.h" />
     <ClInclude Include="include\Renderer\RenderPipeline\ColorPass.h" />
     <ClInclude Include="include\Renderer\Renderer.h" />
@@ -26,12 +28,18 @@
     <ClInclude Include="include\Renderer\Graphics\Mesh.h" />
     <ClInclude Include="include\Renderer\Graphics\Model.h" />
     <ClInclude Include="include\Renderer\Graphics\Light.h" />
+    <ClInclude Include="include\Renderer\RenderPipeline\ScreenPass.h" />
+    <ClInclude Include="include\Renderer\Graphics\Material.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="include\Renderer\Graphics\Texture.h" />
     <ClInclude Include="include\Renderer\Graphics\TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Externals\GLAD\glad.c" />
+    <ClCompile Include="src\Graphics\Material.cpp" />
+    <ClCompile Include="src\RenderPipeline\ScreenPass.cpp" />
+    <ClCompile Include="src\RenderPipeline\DirectionalShadowPass.cpp" />
+    <ClCompile Include="src\Graphics\DirectionalLight.cpp" />
     <ClCompile Include="src\Graphics\Camera.cpp" />
     <ClCompile Include="src\Graphics\Model.cpp" />
     <ClCompile Include="src\Graphics\Mesh.cpp" />

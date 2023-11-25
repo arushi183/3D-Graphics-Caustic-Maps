@@ -23,7 +23,7 @@ namespace graphics
 
 		unsigned int vertexPacketSize = 0;
 		unsigned int vertexAttributeStride = 0;
-		for (int i = 0; i < numVertexLayout; i++)
+		for (unsigned int i = 0; i < numVertexLayout; i++)
 			vertexPacketSize += vertexLayout[i];
 
 		for (unsigned int i = 0; i < numVertexLayout; i++) {

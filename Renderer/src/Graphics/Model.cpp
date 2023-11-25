@@ -6,7 +6,7 @@
 
 namespace graphics
 {
-	Model::Model(const char* fileLoc, Shader* overrideShader)
+	Model::Model(const char* fileLoc, Material* overrideMaterial)
 	{
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(fileLoc, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices);
@@ -17,21 +17,23 @@ namespace graphics
 			return;
 		}
 
-		if (overrideShader != nullptr)
-			m_shader = overrideShader;
+		if (overrideMaterial != nullptr)
+			m_material = overrideMaterial;
 		else
-			m_shader = ShaderManager::getInstance()->loadShader("res/shaders/default.vert", "res/shaders/default.frag");
+			m_material = new Material();
 
 		LoadNode(scene->mRootNode, scene);
+		LoadMaterials(scene);
 	}
 
-	Model::Model(float* vertices, unsigned int numVerts, unsigned int* indices, unsigned int numInd, unsigned int* vertexAttributes, unsigned int numVertAttribs, Shader* overrideShader)
+	Model::Model(float* vertices, unsigned int numVerts, unsigned int* indices, unsigned int numInd, unsigned int* vertexAttributes, unsigned int numVertAttribs, Material* overrideMaterial)
 	{
 		m_meshList.push_back(new Mesh(vertices, numVerts, indices, numInd, vertexAttributes, numVertAttribs));
-		if (overrideShader != nullptr)
-			m_shader = overrideShader;
+		m_meshToTex.push_back(0);
+		if (overrideMaterial != nullptr)
+			m_material = overrideMaterial;
 		else
-			m_shader = ShaderManager::getInstance()->loadShader("res/shaders/default.vert", "res/shaders/default.frag");
+			m_material = new Material();
 	}
 
 	Model::~Model()
@@ -41,15 +43,9 @@ namespace graphics
 			if (m_meshList[i])
 				delete(m_meshList[i]);
 		}
-
-		for (size_t i = 0; i < m_textureList.size(); i++)
-		{
-			if (m_textureList[i])
-				delete(m_textureList[i]);
-		}
 	}
 
-	void Model::render(renderer::Renderer& render)
+	void Model::render(renderer::Renderer& render, Shader* overrideShader)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, transform.position);
@@ -60,10 +56,20 @@ namespace graphics
 
 		model = glm::scale(model, transform.scale);
 
-		m_shader->setUnifromMat4f("u_model", glm::value_ptr(model));
+		if(overrideShader  != nullptr)
+			overrideShader->setUnifromMat4f("u_model", glm::value_ptr(model));
+		else
+		{
+			m_material->shader->setUnifromMat4f("u_model", glm::value_ptr(model));
+			m_material->render();
+		}
 
 		for (size_t i = 0; i < m_meshList.size(); i++)
 		{
+			unsigned int materialIndex = m_meshToTex[i];
+			if (materialIndex < m_textureList.size() && m_textureList[materialIndex]) {
+				m_textureList[materialIndex]->useTexture(1);
+			}
 			m_meshList[i]->render(&render);
 		}
 	}
@@ -75,7 +81,7 @@ namespace graphics
 
 	Shader* Model::getShaderRef() const
 	{
-		return m_shader;
+		return m_material->shader;
 	}
 
 	void Model::LoadNode(aiNode* node, const aiScene* scene)
@@ -123,15 +129,47 @@ namespace graphics
 
 			m_textureList[i] = nullptr;
 
-			if (material->GetTextureCount(aiTextureType_DIFFUSE)) {
+			if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
 				aiString path;
-				if (material->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS) {
+				aiString texture_file;
+				material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), texture_file);
+				if (auto texture = scene->GetEmbeddedTexture(texture_file.C_Str()))
+				{
+					if (texture->mHeight == 0)
+					{
+						char* compressed_texture_data = reinterpret_cast<char*> (texture->pcData);
+						m_textureList[i] = new Texture(compressed_texture_data, texture->mWidth * 4);
+					}
+					else
+					{
+						aiTexel* ARGB = texture->pcData;
+						const size_t numChannels = 4;
+						const size_t dataSize = texture->mWidth * texture->mHeight * numChannels;
+
+						unsigned char* textureData = new unsigned char[dataSize];
+
+						int idx = 0;
+						for (size_t i = 0; i < dataSize; i += 4) {
+							textureData[i + 0] = ARGB[idx].r;
+							textureData[i + 1] = ARGB[idx].g;
+							textureData[i + 2] = ARGB[idx].b;
+							textureData[i + 3] = ARGB[idx].a;
+
+							idx++;
+						}
+
+						m_textureList[i] = new Texture(texture->mWidth, texture->mHeight, textureData);
+
+						delete[] textureData;
+					}
+				}
+				else if (material->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS) {
 					int idx = std::string(path.data).rfind("\\");
 					std::string filename = std::string(path.data).substr(idx + 1);
 
 					std::string texPath = std::string("res/textures/") + filename;
 
-					m_textureList[i] = new Texture(texPath.c_str());
+					m_textureList[i] = TextureManager::getInstance()->loadTexture(texPath.c_str());
 
 					if (!m_textureList[i]) {
 						printf("Failed to load texture at: %s\n", texPath);
@@ -141,7 +179,7 @@ namespace graphics
 				}
 			}
 			if (!m_textureList[i]) {
-				m_textureList[i] = new Texture("res/textures/plain.png");
+				m_textureList[i] = TextureManager::getInstance()->loadTexture("res/textures/plain.png");
 			}
 		}
 	}

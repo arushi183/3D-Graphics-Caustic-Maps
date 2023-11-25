@@ -20,14 +20,13 @@ namespace renderer
 
 	void RenderPipeline::renderPipeline()
 	{
-		for (RenderPass* pass : m_passes)
+		for (int i = 0; i < m_passes.size(); i++)
 		{
-			//Add Logic to keep track of inputs and outputs
-			//pass->setInputs();
-			pass->preRender();
-			pass->render();
-			pass->postRender();
-			//pass->getOutputs();
+			if (i > 0)
+				m_passes[i]->setInputs(m_passes[i - 1]);
+			m_passes[i]->preRender();
+			m_passes[i]->render();
+			m_passes[i]->postRender();
 		}
 	}
 

@@ -3,7 +3,7 @@
 #include "Renderable.h"
 
 #include "Mesh.h"
-#include "ShaderManager.h"
+#include "Material.h"
 #include "TextureManager.h"
 
 #include <vector>
@@ -18,11 +18,11 @@ namespace graphics
 	class Model: public Renderable
 	{
 	public:
-		Model(const char* fileLoc, Shader* overrideShader = nullptr);
-		Model(float* vertices, unsigned int numVerts, unsigned int* indices, unsigned int numInd, unsigned int* vertexAttributes, unsigned int numVertAttribs, Shader* overrideShader = nullptr);
+		Model(const char* fileLoc, Material* overrideMaterial = nullptr);
+		Model(float* vertices, unsigned int numVerts, unsigned int* indices, unsigned int numInd, unsigned int* vertexAttributes, unsigned int numVertAttribs, Material* overrideMaterial = nullptr);
 		~Model();
 
-		void render(renderer::Renderer& render) override;
+		void render(renderer::Renderer& render, Shader* overrideShader = nullptr) override;
 		int type() override;
 		Shader* getShaderRef() const override;
 		
@@ -31,7 +31,7 @@ namespace graphics
 		std::vector<Texture*> m_textureList;
 		std::vector<unsigned int> m_meshToTex;
 
-		Shader* m_shader;
+		Material* m_material;
 
 		void LoadNode(aiNode* node, const aiScene* scene);
 		void LoadMesh(aiMesh* mesh, const aiScene* scene);
