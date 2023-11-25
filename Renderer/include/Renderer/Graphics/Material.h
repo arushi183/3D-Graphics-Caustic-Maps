@@ -10,7 +10,7 @@ namespace graphics
 	struct Material
 	{
 	public:
-		Material(Shader* shader = nullptr);
+		Material(Shader* shader = nullptr, bool recieveShadow = true);
 		
 		void render();
 
@@ -23,6 +23,7 @@ namespace graphics
 		bool setParamVec4(const char* uniform, const float* value);
 
 		Shader* shader;
+		bool reciveShadows;
 	private:
 		std::unordered_map<const char*, int> m_uniforms_int;
 		std::unordered_map<const char*, float> m_uniforms_float;

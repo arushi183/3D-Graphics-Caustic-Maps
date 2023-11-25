@@ -25,6 +25,7 @@ namespace graphics
 		void render(renderer::Renderer& render, Shader* overrideShader = nullptr) override;
 		int type() override;
 		Shader* getShaderRef() const override;
+		Material* getMaterialRef() const override;
 		
 	private:
 		std::vector<Mesh*> m_meshList;

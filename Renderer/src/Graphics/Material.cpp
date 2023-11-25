@@ -3,8 +3,9 @@
 namespace graphics
 {
 
-	Material::Material(Shader* shader)
+	Material::Material(Shader* shader, bool reciveShadows)
 	{
+		this->reciveShadows = reciveShadows;
 		if (shader == nullptr)
 			this->shader = ShaderManager::getInstance()->loadShader("res/shaders/default.vert", "res/shaders/default.frag");
 		else

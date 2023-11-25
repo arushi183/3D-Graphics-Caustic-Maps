@@ -14,28 +14,57 @@
 
 #include <iostream>
 #include <vector>
+#include <stdlib.h>
+#include <time.h>
 
-std::vector<float> Plane_verts = {
-        0.5f, 0, 0.5f,  1,0,  0,-1,0,// top right
-        0.5f, 0,-0.5f,  0,0,  0,-1,0,// bottom right
-       -0.5f, 0,-0.5f,  0,0,  0,-1,0,// bottom left
-       -0.5f, 0, 0.5f,  1,0,  0,-1,0// top left 
-};
+graphics::Model* createWaterPlane(graphics::Material* Watermaterial)
+{
+    int resolution = 500;
 
-std::vector<unsigned int> Plane_ind = {
-    0,1,3,
-    1,2,3
-};
+    std::vector<float> verts;
+    std::vector<unsigned int> ind;
+    std::vector<unsigned int> attribs = { 3 };
 
-std::vector<unsigned int> Plane_vertAttrib = {
-    3, 2, 3
-};
+    for (int y = 0; y < resolution; y++)
+    {
+        for (int x = 0; x < resolution; x++)
+        {
+            float tx = (float)x / (float)(resolution - 1);
+            float ty = (float)y / (float)(resolution - 1);
+            verts.insert(verts.end(), { -0.5f + tx, 0, -0.5f + ty });
+        }
+    }
+
+    for (int y = 0; y < resolution-1; y++)
+    {
+        for (int x = 0; x < resolution-1; x++)
+        {
+            unsigned int quad = y * resolution + x;
+            ind.insert(ind.end(), { quad, quad + resolution, quad + resolution + 1 });
+            ind.insert(ind.end(), { quad, quad + resolution + 1, quad + 1 });
+        }
+    }
+
+    return new graphics::Model(verts.data(), verts.size(), ind.data(), ind.size(), attribs.data(), attribs.size(), Watermaterial);
+}
 
 int main()
 {
     window::Window *mainWindow = new window::Window(800, 450, "Demo");
     renderer::Renderer *mainRenderer = new renderer::Renderer(mainWindow);
     graphics::Scene mainScene;
+
+    srand(0);
+    std::vector<float> WaveDir(96, 0);
+    for (int i = 0; i < 32; i++)
+    {
+        int number = rand() % 100;
+        WaveDir[3 * i + 0] = (float)number / (float)100;
+        number = rand() % 100;
+        WaveDir[3 * i + 1] = (float)number / (float)100;
+        number = rand() % 100;
+        WaveDir[3 * i + 2] = ((float)number / (float)100) * 3;
+    }
 
     graphics::Shader* screenShader = graphics::ShaderManager::getInstance()->loadShader("res/shaders/screen.vert", "res/shaders/screen.frag");
 
@@ -56,36 +85,45 @@ int main()
     graphics::Model* cycle = new graphics::Model("res/models/cycle.glb");
     cycle->transform.position = { 5,0,5 };
 
-    float basecolor[] = { 1,1,1,1 };
-    graphics::Material unTexturedMaterial(graphics::ShaderManager::getInstance()->loadShader("res/shaders/default.vert", "res/shaders/default_color.frag"));
-    unTexturedMaterial.setParamVec4("u_diffuseColor", &basecolor[0]);
+    float waterColor[] = { 0.16,0.83,1,0.5 };
+    float time = 0.0f;
+    graphics::Material waterMaterial(graphics::ShaderManager::getInstance()->loadShader("res/shaders/water.vert", "res/shaders/water.frag"), false);
+    waterMaterial.setParamVec4("u_diffuseColor", &waterColor[0]);
+    std::vector<std::string> uniforms(32, "");
+    for (int i = 0; i < 96; i += 3)
+    {
+        int loc = i / 3;
+        uniforms[loc] = "u_wave[" + std::to_string(loc) + "]";
+        waterMaterial.setParamVec3(uniforms[loc].c_str(), &WaveDir[i]);
+    }
 
-    graphics::Model* plane = new graphics::Model(Plane_verts.data(), Plane_verts.size(), Plane_ind.data(), Plane_ind.size(), Plane_vertAttrib.data(), Plane_vertAttrib.size(), &unTexturedMaterial);
-    plane->transform.position = { 0,0,0 };
-    plane->transform.scale = { 50,50,50 };
+    waterMaterial.setParamFloat("u_time", time);
+    graphics::Model* water = createWaterPlane(&waterMaterial);
+    water->transform.position = { 0,0,0 };
+    water->transform.scale = { 50,50,50 };
 
-    graphics::Model* sphere = new graphics::Model("res/models/sphere.fbx", &unTexturedMaterial);
+    graphics::Model* sphere = new graphics::Model("res/models/sphere.fbx");
     sphere->transform.position = { 0,10,0 };
 
     mainScene.addGraphics(cycle);
-    mainScene.addGraphics(plane);
+    mainScene.addGraphics(water);
     mainScene.addGraphics(sphere);
 
     mainScene.addLight(sun);
 
     float rot = 0;
-    float angle = 0;
     while (!mainWindow->isClosed())
     {
         pipeline.renderPipeline();
 
         float deltaTime = mainWindow->getInputs()->getDeltaTime();
         rot += deltaTime * 50.0f;
-        angle += deltaTime * 50.0f;
+        time += deltaTime * 2.0f;
         if (rot >= 360)
             rot -= 360;
         sun->transform.rotation = { 145, rot, 0 };
-       
+        waterMaterial.setParamFloat("u_time", time);
+
         mainScene.handleInput(mainWindow->getInputs());
     }
 

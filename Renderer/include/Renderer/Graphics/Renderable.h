@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Shader.h"
+#include "Material.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -31,6 +31,7 @@ namespace graphics
 		virtual void render(renderer::Renderer& render, Shader* overrideShader = nullptr) = 0;
 		virtual int type() = 0;
 		virtual Shader* getShaderRef() const = 0;
+		virtual Material* getMaterialRef() const = 0;
 
 		Tranformation transform;
 	};

@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>D:\Projects\3D-Renderer\bin\Debug\Sandbox\Sandbox.exe</FullPath>
+      <FullPath>D:\Projects\3D-Graphics-Caustic-Maps\bin\Debug\Sandbox\Sandbox.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

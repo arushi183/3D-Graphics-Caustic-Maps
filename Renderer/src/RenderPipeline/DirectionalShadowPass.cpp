@@ -57,7 +57,10 @@ namespace renderer
 					for (auto& set : m_scene->meshList)
 					{
 						for (graphics::Renderable* mesh : set.second)
-							mesh->render(*m_renderer, m_depthMapShader);
+						{
+							if(mesh->getMaterialRef()->reciveShadows)
+								mesh->render(*m_renderer, m_depthMapShader);
+						}
 					}
 				}
 			}

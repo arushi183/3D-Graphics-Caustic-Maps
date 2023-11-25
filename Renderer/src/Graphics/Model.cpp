@@ -84,6 +84,11 @@ namespace graphics
 		return m_material->shader;
 	}
 
+	Material* Model::getMaterialRef() const
+	{
+		return m_material;
+	}
+
 	void Model::LoadNode(aiNode* node, const aiScene* scene)
 	{
 		for (size_t i = 0; i < node->mNumMeshes; i++)
