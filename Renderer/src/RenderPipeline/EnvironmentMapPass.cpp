@@ -15,31 +15,62 @@ namespace renderer
 		:RenderPass(renderer), m_scene(scene), m_environmentMapShader(nullptr)
 	{
 		m_environmentMapShader = graphics::ShaderManager::getInstance()->loadShader("res/shaders/environmentmap.vert", "res/shaders/environmentmap.frag");
+		m_projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
 	}
 
 	void EnvironmentMapPass::preRender()
 	{
-		glCullFace(GL_FRONT);
 		m_environmentMapShader->bind();
-		m_environmentMapShader->setUniformInt("t_alphaTex", 1);
+
 		
-		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glViewport(0, 0, 720, 720);
+		glBindFramebuffer(GL_FRAMEBUFFER, 
+		/*for (auto& set : m_scene->meshList)
+		{
+			for (auto& mesh : set.second)
+			{
+				if ((mesh->getMaterialRef()->passes & CUBEMAP_PASS) != 0)
+				{
+					m_DrawList.push_back(mesh);
+					glBindFramebuffer(GL_FRAMEBUFFER, mesh->getMaterialRef()->CubeMapFBO);
+					for (int i = 0; i < 6; i++) {
+						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, mesh->getMaterialRef()->cubeMapTexture->getTextureID(), 0);
+						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+					}
+				}
+			}
+		}*/
 		
 	}
 
 	void EnvironmentMapPass::render()
 	{
-		/*m_screenShader->bind();
-		m_colorTexture->useTexture(0);
-		m_renderer->render(m_VAO, 6);*/
-
-		//m_environmentMapShader->setUnifromMat4f("u_projection_view", glm::value_ptr(sunLight->getLightTransform()));
-		for (auto& set : m_scene->meshList)
+		
+		for (auto& target : m_DrawList)
 		{
-			for (graphics::Renderable* mesh : set.second)
+			glBindFramebuffer(GL_FRAMEBUFFER, target->getMaterialRef()->CubeMapFBO);
+
+			std::vector<glm::mat4> cubeMatrices;
+			cubeMatrices.push_back(glm::lookAt(target->transform.position, target->transform.position + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
+
+
+			for (int i = 0; i < cubeMatrices.size(); i++)
 			{
-				if (mesh->getMaterialRef()->reciveShadows)
-					mesh->render(*m_renderer, m_environmentMapShader);
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, target->getMaterialRef()->cubeMapTexture->getTextureID(), 0);
+
+				for (auto& set : m_scene->meshList)
+				{
+					graphics::Shader* shader = set.first;
+					shader->bind();
+
+					shader->setUnifromMat4f("u_projection", glm::value_ptr(m_projection));
+					shader->setUnifromMat4f("u_view", glm::value_ptr(cubeMatrices[i]));
+					for (graphics::Renderable* mesh : set.second)
+					{
+						if (mesh != target && (mesh->getMaterialRef()->passes & COLOR_PASS) != 0)
+							mesh->render(*m_renderer, shader);
+					}
+				}
 			}
 		}
 	}
@@ -47,7 +78,6 @@ namespace renderer
 	void EnvironmentMapPass::postRender()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glCullFace(GL_BACK);
 	}
 
 	void EnvironmentMapPass::setInputs(RenderPass* pass)

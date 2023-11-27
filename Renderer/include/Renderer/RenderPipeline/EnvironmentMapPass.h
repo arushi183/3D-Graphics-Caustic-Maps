@@ -26,6 +26,8 @@ namespace renderer
 		graphics::Shader* m_environmentMapShader;
 		std::unordered_map<graphics::Texture*, graphics::Light*> m_shadowMaps;
 		std::vector<unsigned int> m_shadowFBOs;
+		glm::mat4 m_projection;
+		std::vector<graphics::Renderable*> m_DrawList;
 	};
 
 }
