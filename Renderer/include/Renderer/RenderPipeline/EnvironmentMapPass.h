@@ -24,10 +24,10 @@ namespace renderer
 	private:
 		graphics::Scene* m_scene;
 		graphics::Shader* m_environmentMapShader;
-		std::unordered_map<graphics::Texture*, graphics::Light*> m_shadowMaps;
-		std::vector<unsigned int> m_shadowFBOs;
+		graphics::Texture* m_environmentTexture;
+		graphics::Texture* m_depthTexture;
+		unsigned int m_environmentFBO;
 		glm::mat4 m_projection;
-		std::vector<graphics::Renderable*> m_DrawList;
 	};
 
 }

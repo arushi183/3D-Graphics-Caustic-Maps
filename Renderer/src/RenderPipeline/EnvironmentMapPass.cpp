@@ -14,63 +14,77 @@ namespace renderer
 	EnvironmentMapPass::EnvironmentMapPass(graphics::Scene* scene, Renderer* renderer)
 		:RenderPass(renderer), m_scene(scene), m_environmentMapShader(nullptr)
 	{
-		m_environmentMapShader = graphics::ShaderManager::getInstance()->loadShader("res/shaders/environmentmap.vert", "res/shaders/environmentmap.frag");
+		//m_environmentMapShader = graphics::ShaderManager::getInstance()->loadShader("res/shaders/environmentmap.vert", "res/shaders/environmentmap.frag");
 		m_projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
+
+		m_environmentTexture = new graphics::Texture(720, 720, 3);
+		m_depthTexture = new graphics::Texture(720, 720, 1);
+		glGenFramebuffers(1, &m_environmentFBO);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, m_environmentFBO);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_environmentTexture->getTextureID(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture->getTextureID(), 0);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void EnvironmentMapPass::preRender()
 	{
-		m_environmentMapShader->bind();
-
-		
+		//m_environmentMapShader->bind();
 		glViewport(0, 0, 720, 720);
-		glBindFramebuffer(GL_FRAMEBUFFER, 
-		/*for (auto& set : m_scene->meshList)
-		{
-			for (auto& mesh : set.second)
-			{
-				if ((mesh->getMaterialRef()->passes & CUBEMAP_PASS) != 0)
-				{
-					m_DrawList.push_back(mesh);
-					glBindFramebuffer(GL_FRAMEBUFFER, mesh->getMaterialRef()->CubeMapFBO);
-					for (int i = 0; i < 6; i++) {
-						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, mesh->getMaterialRef()->cubeMapTexture->getTextureID(), 0);
-						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-					}
-				}
-			}
-		}*/
 		
+		glBindFramebuffer(GL_FRAMEBUFFER, m_environmentFBO);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
 	void EnvironmentMapPass::render()
 	{
-		
-		for (auto& target : m_DrawList)
-		{
-			glBindFramebuffer(GL_FRAMEBUFFER, target->getMaterialRef()->CubeMapFBO);
-
-			std::vector<glm::mat4> cubeMatrices;
-			cubeMatrices.push_back(glm::lookAt(target->transform.position, target->transform.position + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
-
-
-			for (int i = 0; i < cubeMatrices.size(); i++)
+			glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+			/*
+			for (auto& set : m_scene->meshList)
 			{
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, target->getMaterialRef()->cubeMapTexture->getTextureID(), 0);
+				graphics::Shader* shader = set.first;
+				shader->bind();
 
-				for (auto& set : m_scene->meshList)
+				shader->setUnifromMat4f("u_projection", glm::value_ptr(m_projection));
+				shader->setUnifromMat4f("u_view", glm::value_ptr(viewMatrix));
+				for (graphics::Renderable* mesh : set.second)
 				{
-					graphics::Shader* shader = set.first;
-					shader->bind();
-
-					shader->setUnifromMat4f("u_projection", glm::value_ptr(m_projection));
-					shader->setUnifromMat4f("u_view", glm::value_ptr(cubeMatrices[i]));
-					for (graphics::Renderable* mesh : set.second)
-					{
-						if (mesh != target && (mesh->getMaterialRef()->passes & COLOR_PASS) != 0)
-							mesh->render(*m_renderer, shader);
-					}
+					if (mesh->transform.position != glm::vec3(0.0, 0.0, 0.0) && (mesh->getMaterialRef()->passes & COLOR_PASS) != 0)
+						mesh->render(*m_renderer, shader);
 				}
+			}*/
+		for (auto& set : m_scene->meshList)
+		{
+			graphics::Shader* shader = set.first;
+			shader->bind();
+
+			shader->setUnifromMat4f("u_projection", glm::value_ptr(m_projection));
+			shader->setUnifromMat4f("u_view", glm::value_ptr(viewMatrix));
+
+			shader->setUniformVec3("u_cameraPos", glm::value_ptr(m_scene->mainCamera->transform.position));
+			shader->setUniformInt("t_diffuseTex", 1);
+
+
+			int point_light_index = 0;
+			int spot_light_index = 0;
+			for (size_t i = 0; i < m_scene->lightList.size(); i++)
+			{
+				if (m_scene->lightList[i]->getType() == DIRECTIONAL_LIGHT)
+				{
+					graphics::DirectionalLight* light = (graphics::DirectionalLight*)m_scene->lightList[i];
+					shader->setUniformFloat("u_directionalLight.base.ambientIntensity", (light->ambientIntensity));
+					shader->setUniformFloat("u_directionalLight.base.diffuseIntensity", (light->diffuseIntensity));
+					shader->setUniformVec3("u_directionalLight.base.color", glm::value_ptr(light->color));
+					shader->setUniformVec3("u_directionalLight.direction", glm::value_ptr(light->getForward()));
+
+				}
+			}
+
+			for (graphics::Renderable* mesh : set.second)
+			{
+				if (mesh->transform.position != glm::vec3(0.0, 0.0, 0.0) && (mesh->getMaterialRef()->passes & COLOR_PASS) != 0)
+					mesh->render(*m_renderer, shader);
 			}
 		}
 	}
@@ -86,12 +100,9 @@ namespace renderer
 
 	void EnvironmentMapPass::getOutputs(void* inputStruct)
 	{
-		std::unordered_map<graphics::Light*, graphics::Texture*>* shadowStruct = (std::unordered_map<graphics::Light*, graphics::Texture*>*)inputStruct;
-		(*shadowStruct).clear();
-		for (auto& shmap : m_shadowMaps)
-		{
-			(*shadowStruct)[shmap.second] = shmap.first;
-		}
+		std::vector<graphics::Texture*>* colorTextureRef = (std::vector<graphics::Texture*>*) inputStruct;
+		colorTextureRef->push_back(m_environmentTexture);
+		colorTextureRef->push_back(m_depthTexture);
 	}
 
 }

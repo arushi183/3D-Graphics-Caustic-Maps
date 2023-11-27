@@ -76,7 +76,7 @@ int main()
     pipeline.addPass(new renderer::EnvironmentMapPass(&mainScene, mainRenderer));
     pipeline.addPass(new renderer::CubeMapPass(&mainScene, mainRenderer));
     pipeline.addPass(new renderer::DirectionalShadowPass(&mainScene, mainRenderer));
-    // 1 Environment Pass and second is Caustic Pass
+    // Caustic Pass
     pipeline.addPass(new renderer::ColorPass(&mainScene, mainRenderer));
     pipeline.addPass(new renderer::ScreenPass(&mainScene, mainRenderer, screenShader));
     
