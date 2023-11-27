@@ -24,7 +24,9 @@ struct DirectionalLight
 
 uniform DirectionalLight u_directionalLight;
 uniform sampler2D t_directionalShadowMap;
+uniform samplerCube t_cubeMap;
 
+uniform vec3 u_cameraPos;
 uniform vec4 u_diffuseColor;
 
 float shadowCalc(vec4 fragPosLightTransform)
@@ -55,14 +57,32 @@ float shadowCalc(vec4 fragPosLightTransform)
 
 void main()
 {
-	vec4 baseColor = u_diffuseColor;
+
+	float refraction_ratio = 1.00 / 1.33;
+	vec3 fragToEye = normalize(fs_in.frag_pos-u_cameraPos);
+	float fresnel = pow((1-max(dot(normalize(fs_in.frag_normal), fragToEye), 0.0f)), 1);
+	vec3 refractedRay = normalize(refract(fragToEye, -normalize(fs_in.frag_normal),refraction_ratio));
+	vec3 reflectedRay = normalize(reflect(fragToEye, -normalize(fs_in.frag_normal)));
+
+	vec3 refractionColor = texture(t_cubeMap, refractedRay).xyz;
+	vec3 reflectionColor = texture(t_cubeMap, reflectedRay).xyz;
+	
+	vec3 baseColor = mix(refractionColor, u_diffuseColor.xyz, min(fresnel+0.2,1));
+	baseColor = mix(baseColor, reflectionColor, 0.25);
 
 	vec4 ambientColor = vec4(u_directionalLight.base.color, 1.0) * u_directionalLight.base.ambientIntensity;
 
 	float diffuseFactor = max(dot(normalize(fs_in.frag_normal), normalize(u_directionalLight.direction)), 0.0f);
 	vec4 diffuseColor = vec4(u_directionalLight.base.color, 1.0f) *  u_directionalLight.base.diffuseIntensity * diffuseFactor;
 
-	float shadowFactor = shadowCalc(fs_in.frag_lightTransform);
+	fragToEye = normalize(u_cameraPos - fs_in.frag_pos);
+	vec3 reflected = normalize(reflect(u_directionalLight.direction, normalize(fs_in.frag_normal)));
+	
+	vec4 specularColor = vec4(0,0,0,0);
+	float specularFactor = dot(fragToEye, reflected);
+	specularFactor = pow(specularFactor, 32);
+	if(specularFactor > 0)
+		specularColor = vec4(u_directionalLight.base.color, 1.0f) * specularFactor;
 
-	FragColor = vec4(baseColor.xyz * (ambientColor.xyz + ((1.0 - shadowFactor) * (diffuseColor.xyz))), baseColor.w);
+	FragColor = vec4(baseColor.xyz * (ambientColor.xyz + (diffuseColor.xyz + specularColor.xyz)), 1.0);
 }

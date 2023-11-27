@@ -22,7 +22,7 @@ namespace graphics
 		Model(float* vertices, unsigned int numVerts, unsigned int* indices, unsigned int numInd, unsigned int* vertexAttributes, unsigned int numVertAttribs, Material* overrideMaterial = nullptr);
 		~Model();
 
-		void render(renderer::Renderer& render, Shader* overrideShader = nullptr) override;
+		void render(renderer::Renderer& render, Shader* overrideShader) override;
 		int type() override;
 		Shader* getShaderRef() const override;
 		Material* getMaterialRef() const override;

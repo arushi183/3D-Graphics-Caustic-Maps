@@ -1,7 +1,9 @@
 #include <Renderer/Renderer.h>
 #include <Renderer/RenderPipeline/RenderPipeline.h>
+
 #include <Renderer/RenderPipeline/ColorPass.h>
 #include <Renderer/RenderPipeline/DirectionalShadowPass.h>
+#include <Renderer/RenderPipeline/CubeMapPass.h>
 #include <Renderer/RenderPipeline/ScreenPass.h>
 
 #include <Renderer/Graphics/Material.h>
@@ -69,17 +71,20 @@ int main()
     graphics::Shader* screenShader = graphics::ShaderManager::getInstance()->loadShader("res/shaders/screen.vert", "res/shaders/screen.frag");
 
     renderer::RenderPipeline pipeline;
+    //Environment Cube Pass
+    pipeline.addPass(new renderer::CubeMapPass(&mainScene, mainRenderer));
     pipeline.addPass(new renderer::DirectionalShadowPass(&mainScene, mainRenderer));
+    // 1 Environment Pass and second is Causitc Pass
     pipeline.addPass(new renderer::ColorPass(&mainScene, mainRenderer));
-    pipeline.addPass(new renderer::ScreenPass(mainRenderer, screenShader));
+    pipeline.addPass(new renderer::ScreenPass(&mainScene, mainRenderer, screenShader));
 
     mainScene.setCamera(new graphics::Camera(mainWindow));
     
     graphics::DirectionalLight* sun = new graphics::DirectionalLight(true);
     sun->color = { 1.0f, 0.96f, 0.83f };
     sun->transform.rotation = { 145.0f, 0.0f, 0.0f };
-    sun->transform.position = { 0.0f, 15.0f, 15.0f };
-    sun->ambientIntensity = 0.1f;
+    sun->transform.position = { 0.0f, 10.0f, 10.0f };
+    sun->ambientIntensity = 0.5f;
     sun->diffuseIntensity = 1.0f;
 
     graphics::Model* cycle = new graphics::Model("res/models/cycle.glb");
@@ -87,7 +92,7 @@ int main()
 
     float waterColor[] = { 0.16,0.83,1,0.5 };
     float time = 0.0f;
-    graphics::Material waterMaterial(graphics::ShaderManager::getInstance()->loadShader("res/shaders/water.vert", "res/shaders/water.frag"), false);
+    graphics::Material waterMaterial(graphics::ShaderManager::getInstance()->loadShader("res/shaders/water.vert", "res/shaders/water.frag"), COLOR_PASS | CUBEMAP_PASS);
     waterMaterial.setParamVec4("u_diffuseColor", &waterColor[0]);
     std::vector<std::string> uniforms(32, "");
     for (int i = 0; i < 96; i += 3)
@@ -105,9 +110,15 @@ int main()
     graphics::Model* sphere = new graphics::Model("res/models/sphere.fbx");
     sphere->transform.position = { 0,10,0 };
 
+    graphics::Model* underwater = new graphics::Model("res/models/underwater.glb");
+    underwater->transform.rotation = { 90,0,0 };
+    underwater->transform.position = { 0,-20,0 };
+    underwater->transform.scale = { 2,2,2 };
+
     mainScene.addGraphics(cycle);
     mainScene.addGraphics(water);
     mainScene.addGraphics(sphere);
+    mainScene.addGraphics(underwater);
 
     mainScene.addLight(sun);
 

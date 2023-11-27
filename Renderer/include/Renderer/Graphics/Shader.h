@@ -6,6 +6,7 @@ namespace graphics
 	class Shader {
 	public:
 		Shader(const char* vertexShader, const char* fragmentShader);
+		Shader(const char* vertexShader, const char* fragmentShader, const char* geometryShader);
 		~Shader();
 
 		void bind();
@@ -20,6 +21,8 @@ namespace graphics
 		bool setUniformVec4(const char* uniform, const float* value);
 
 		bool setUnifromMat4f(const char* uniform, const float* value);
+
+		const char *vertexShaderCode, *fragmentShaderCode, *geometryShaderCode;
 	private:
 		unsigned int m_program;
 		std::unordered_map<const char*, unsigned int> m_uniformLookup;

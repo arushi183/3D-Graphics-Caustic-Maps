@@ -19,7 +19,7 @@ namespace renderer
 		FuncPtr frameupdateCallback = [this](unsigned int a, unsigned int b) { updateFrameBufferResolution(a, b); };
 		window->addSizeCallback(frameupdateCallback);
 		
-		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+		glClearColor(0.83f, 1.0f, 0.96f, 1.0f);
 
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
@@ -27,8 +27,8 @@ namespace renderer
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
 
-		glEnable(GL_LINE_WIDTH);
-		glLineWidth(2);
+		//glEnable(GL_LINE_WIDTH);
+		//glLineWidth(2); 
 	}
 
 	Renderer::~Renderer()

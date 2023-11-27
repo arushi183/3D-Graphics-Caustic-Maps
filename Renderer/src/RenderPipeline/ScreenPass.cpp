@@ -12,8 +12,8 @@
 namespace renderer
 {
 
-	ScreenPass::ScreenPass(Renderer* renderer, graphics::Shader* screenShader)
-		:RenderPass(renderer), m_screenShader(screenShader)
+	ScreenPass::ScreenPass(graphics::Scene* scene, Renderer* renderer, graphics::Shader* screenShader)
+		:RenderPass(renderer), m_screenShader(screenShader), m_scene(scene)
 	{
 		GLint m_viewport[4];
 		glGetIntegerv(GL_VIEWPORT, m_viewport);
@@ -21,6 +21,7 @@ namespace renderer
 		m_viewportHeight = m_viewport[3];
 
 		m_colorTexture = nullptr;
+		m_depthTexture = nullptr;
 
 		float vertices[] = {
 			-1, -1, 0, 0, 0,
@@ -72,7 +73,21 @@ namespace renderer
 	void ScreenPass::render()
 	{
 		m_screenShader->bind();
+
+		m_screenShader->setUnifromMat4f("u_view", m_scene->mainCamera->getViewMatrix());
+		m_screenShader->setUnifromMat4f("u_projection", m_scene->mainCamera->getProjectionMatrix());
+
+		m_screenShader->setUniformVec3("u_cameraPos", glm::value_ptr(m_scene->mainCamera->transform.position));
+
+		m_screenShader->setUniformFloat("m_halfScreenWidth", m_viewportWidth / 2);
+		m_screenShader->setUniformFloat("m_halfScreenHeight", m_viewportHeight / 2);
+		m_screenShader->setUniformFloat("m_near", 0.1f);
+		m_screenShader->setUniformFloat("m_far", 1000.0f);
+
+
+		m_screenShader->setUniformInt("t_depthTex", 1);
 		m_colorTexture->useTexture(0);
+		m_depthTexture->useTexture(1);
 		m_renderer->render(m_VAO, 6);
 	}
 
@@ -83,9 +98,10 @@ namespace renderer
 	void ScreenPass::setInputs(RenderPass* pass)
 	{
 		ColorPass* input = (ColorPass*)pass;
-		graphics::Texture** colorTextureRef;
+		std::vector<graphics::Texture*> colorTextureRef;
 		input->getOutputs((void*)&colorTextureRef);
-		m_colorTexture = *colorTextureRef;
+		m_colorTexture = colorTextureRef[0];
+		m_depthTexture = colorTextureRef[1];
 	}
 
 	void ScreenPass::getOutputs(void* inputStruct)

@@ -23,8 +23,8 @@ namespace renderer
 		graphics::Shader* m_lineShader;
 		int m_viewportHeight, m_viewportWidth;
 		unsigned int m_ColorFBO;
-		unsigned int m_RBO;
 		graphics::Texture* m_colorTexture;
+		graphics::Texture* m_depthTexture;
 
 		std::unordered_map<graphics::Light*, graphics::Texture*> m_shadowStruct;
 	};

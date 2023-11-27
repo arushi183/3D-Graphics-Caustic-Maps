@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Renderer\Graphics\CubeMapTexture.h" />
+    <ClInclude Include="include\Renderer\RenderPipeline\CubeMapPass.h" />
     <ClInclude Include="include\Renderer\RenderPipeline\DirectionalShadowPass.h" />
     <ClInclude Include="include\Renderer\Graphics\DirectionalLight.h" />
     <ClInclude Include="include\Renderer\Graphics\Camera.h" />
@@ -36,6 +38,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Externals\GLAD\glad.c" />
+    <ClCompile Include="src\Graphics\CubeMapTexture.cpp" />
+    <ClCompile Include="src\RenderPipeline\CubeMapPass.cpp" />
     <ClCompile Include="src\Graphics\Material.cpp" />
     <ClCompile Include="src\RenderPipeline\ScreenPass.cpp" />
     <ClCompile Include="src\RenderPipeline\DirectionalShadowPass.cpp" />

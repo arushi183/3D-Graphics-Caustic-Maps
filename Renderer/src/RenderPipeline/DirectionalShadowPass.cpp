@@ -58,7 +58,7 @@ namespace renderer
 					{
 						for (graphics::Renderable* mesh : set.second)
 						{
-							if(mesh->getMaterialRef()->reciveShadows)
+							if((mesh->getMaterialRef()->passes & SHADOW_PASS) != 0)
 								mesh->render(*m_renderer, m_depthMapShader);
 						}
 					}

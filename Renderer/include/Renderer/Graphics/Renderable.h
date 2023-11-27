@@ -28,7 +28,7 @@ namespace graphics
 	class Renderable
 	{
 	public:
-		virtual void render(renderer::Renderer& render, Shader* overrideShader = nullptr) = 0;
+		virtual void render(renderer::Renderer& render, Shader* overrideShader) = 0;
 		virtual int type() = 0;
 		virtual Shader* getShaderRef() const = 0;
 		virtual Material* getMaterialRef() const = 0;

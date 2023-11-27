@@ -56,13 +56,8 @@ namespace graphics
 
 		model = glm::scale(model, transform.scale);
 
-		if(overrideShader  != nullptr)
-			overrideShader->setUnifromMat4f("u_model", glm::value_ptr(model));
-		else
-		{
-			m_material->shader->setUnifromMat4f("u_model", glm::value_ptr(model));
-			m_material->render();
-		}
+		overrideShader->setUnifromMat4f("u_model", glm::value_ptr(model));
+		m_material->render(overrideShader);
 
 		for (size_t i = 0; i < m_meshList.size(); i++)
 		{

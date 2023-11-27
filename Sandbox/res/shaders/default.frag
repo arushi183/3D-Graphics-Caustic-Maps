@@ -23,6 +23,7 @@ struct DirectionalLight
 };
 
 uniform DirectionalLight u_directionalLight;
+uniform vec3 u_cameraPos;
 
 uniform sampler2D t_directionalShadowMap;
 uniform sampler2D t_diffuseTex;
@@ -66,7 +67,16 @@ void main()
 	float diffuseFactor = max(dot(normalize(fs_in.frag_normal), normalize(u_directionalLight.direction)), 0.0f);
 	vec4 diffuseColor = vec4(u_directionalLight.base.color, 1.0f) *  u_directionalLight.base.diffuseIntensity * diffuseFactor;
 
+	vec3 fragToEye = normalize(u_cameraPos - fs_in.frag_pos);
+	vec3 reflected = normalize(reflect(u_directionalLight.direction, normalize(fs_in.frag_normal)));
+	
+	vec4 specularColor = vec4(0,0,0,0);
+	float specularFactor = dot(fragToEye, reflected);
+	specularFactor = pow(specularFactor, 32);
+	if(specularFactor > 0)
+		specularColor = vec4(u_directionalLight.base.color, 1.0f) * specularFactor;
+
 	float shadowFactor = shadowCalc(fs_in.frag_lightTransform);
 
-	FragColor = vec4(baseColor.xyz * (ambientColor.xyz + ((1.0 - shadowFactor) * (diffuseColor.xyz))), baseColor.w);
+	FragColor = vec4(baseColor.xyz * (ambientColor.xyz + ((1.0 - shadowFactor) * (diffuseColor.xyz + specularColor.xyz))), baseColor.w);
 }

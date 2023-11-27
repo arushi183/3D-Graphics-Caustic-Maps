@@ -21,17 +21,13 @@ namespace renderer
 		m_viewportWidth = m_viewport[2];
 		m_viewportHeight = m_viewport[3];
 
-		glGenRenderbuffers(1, &m_RBO);
-		glBindRenderbuffer(GL_RENDERBUFFER, m_RBO);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_viewportWidth, m_viewportHeight);
-		glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
 		m_colorTexture = new graphics::Texture(m_viewportWidth, m_viewportHeight, 3);
+		m_depthTexture = new graphics::Texture(m_viewportWidth, m_viewportHeight, 1);
 		glGenFramebuffers(1, &m_ColorFBO);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, m_ColorFBO);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorTexture->getTextureID(), 0);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RBO);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture->getTextureID(), 0);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
@@ -41,8 +37,8 @@ namespace renderer
 		if (m_ColorFBO != 0)
 		{
 			delete(m_colorTexture);
+			delete(m_depthTexture);
 			glDeleteFramebuffers(1, &m_ColorFBO);
-			glDeleteRenderbuffers(1, &m_RBO);
 		}
 	}
 
@@ -62,6 +58,8 @@ namespace renderer
 
 			shader->setUnifromMat4f("u_projection", m_scene->mainCamera->getProjectionMatrix());
 			shader->setUnifromMat4f("u_view", m_scene->mainCamera->getViewMatrix());
+
+			shader->setUniformVec3("u_cameraPos", glm::value_ptr(m_scene->mainCamera->transform.position));
 			shader->setUniformInt("t_diffuseTex", 1);
 			
 
@@ -84,10 +82,12 @@ namespace renderer
 					}
 				}
 			}
-			// and inputs
 
 			for (graphics::Renderable* mesh : set.second)
-				mesh->render(*m_renderer);
+			{
+				if((mesh->getMaterialRef()->passes & COLOR_PASS) != 0)
+					mesh->render(*m_renderer, shader);
+			}
 		}
 		m_lineShader->bind();
 		m_lineShader->setUnifromMat4f("u_projection", m_scene->mainCamera->getProjectionMatrix());
@@ -111,7 +111,8 @@ namespace renderer
 
 	void ColorPass::getOutputs(void* inputStruct)
 	{
-		graphics::Texture*** input = (graphics::Texture***)inputStruct;
-		*(input) = &m_colorTexture;
+		std::vector<graphics::Texture*> *input = (std::vector<graphics::Texture*>*)inputStruct;
+		input->push_back(m_colorTexture);
+		input->push_back(m_depthTexture);
 	}
 }

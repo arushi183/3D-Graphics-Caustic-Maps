@@ -1,31 +1,64 @@
 #include "Renderer/Graphics/Material.h"
 
+#include <glad/glad.h>
+
 namespace graphics
 {
 
-	Material::Material(Shader* shader, bool reciveShadows)
+	Material::Material(Shader* shader, unsigned int pass)
+		:cubeMapTexture(nullptr), CubeMapFBO(0), m_RBO(0)
 	{
-		this->reciveShadows = reciveShadows;
+		this->passes = pass;
 		if (shader == nullptr)
 			this->shader = ShaderManager::getInstance()->loadShader("res/shaders/default.vert", "res/shaders/default.frag");
 		else
 			this->shader = shader;
+
+		if ((pass & CUBEMAP_PASS) != 0)
+		{
+			glGenRenderbuffers(1, &m_RBO);
+			glBindRenderbuffer(GL_RENDERBUFFER, m_RBO);
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 720, 720);
+			glBindRenderbuffer(GL_RENDERBUFFER, 0);
+			cubeMapTexture = new CubeMapTexture(720, 720, 3);
+			glGenFramebuffers(1, &CubeMapFBO);
+
+			glBindFramebuffer(GL_FRAMEBUFFER, CubeMapFBO);
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RBO);
+
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
 	}
 
-	void Material::render()
+	Material::~Material()
+	{
+		if (cubeMapTexture != nullptr)
+		{
+			delete(cubeMapTexture);
+			glDeleteFramebuffers(1, &CubeMapFBO);
+			glDeleteRenderbuffers(1, &m_RBO);
+		}
+	}
+
+	void Material::render(Shader* overrideShader)
 	{
 		for (auto& e : m_uniforms_int)
-			shader->setUniformInt(e.first, e.second);
+			overrideShader->setUniformInt(e.first, e.second);
 		for (auto& e : m_uniforms_float)
-			shader->setUniformFloat(e.first, e.second);
+			overrideShader->setUniformFloat(e.first, e.second);
 		for (auto& e : m_uniforms_bool)
-			shader->setUniformBool(e.first, e.second);
+			overrideShader->setUniformBool(e.first, e.second);
 		for (auto& e : m_uniforms_Vec2)
-			shader->setUniformVec2(e.first, e.second);
+			overrideShader->setUniformVec2(e.first, e.second);
 		for (auto& e : m_uniforms_Vec3)
-			shader->setUniformVec3(e.first, e.second);
+			overrideShader->setUniformVec3(e.first, e.second);
 		for (auto& e : m_uniforms_Vec4)
-			shader->setUniformVec4(e.first, e.second);
+			overrideShader->setUniformVec4(e.first, e.second);
+		if ((passes & CUBEMAP_PASS) != 0)
+		{
+			overrideShader->setUniformInt("t_cubeMap", 3);
+			cubeMapTexture->useTexture(3);
+		}
 	}
 
 	bool Material::setParamInt(const char* uniform, int value)

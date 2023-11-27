@@ -19,23 +19,39 @@ out VS_OUT
 
 vec3 calculateHeight(vec3 position)
 {
-    vec3 output = vec3(0,1,1);
-    output.x += sin(dot(u_wave[0].xy,position.xz) * 1000 + u_time);
-    //vec2 dir = vec2(0,1);
-    //output.x = sin(dot(dir.xy, position.xz) + u_time);
-    //output.y = 1 * cos(dot(dir.xy, position.xz) + u_time);
-    //output.z = 1 * cos(dot(dir.xy, position.xz) + u_time);
+    vec3 output = vec3(0,0,0);
 
-    //float amplitude = 0.3f;
-    //float frequency = 1.0f;
-    //for(int i=0; i<32; i++)
-    //{
-    //    output.x += amplitude * sin(dot(u_wave[i].xy,position.xz) * frequency + u_time);
-    //    frequency *= 7.18f;
-    //    amplitude *= 0.282f;
-    //}
+    float amplitude = 1.0f;
+    float frequency = 0.3f;
 
-    return output;
+    vec3 p = position;
+    float amplitudeSum = 0;
+
+    for(int i=0; i<32; i++)
+    {
+        vec2 d = normalize(u_wave[i].xy);
+
+        float x = dot(d, p.xz) * frequency + u_time;
+        float wave = amplitude * exp(sin(x));
+        float dx = wave * cos(x);
+
+
+        output.x += wave;
+
+        output.y += d.x * dx; 
+        output.z += d.y * dx;
+
+        p.xz += d * -dx * amplitude;
+
+        amplitudeSum += amplitude;
+
+        frequency *= 1.18f;
+        amplitude *= 0.82f;
+    }
+
+    output = output / amplitudeSum;
+
+    return output * 0.5;
 }
 
 void main()
@@ -44,8 +60,8 @@ void main()
     vec3 wave = calculateHeight(pos);
     pos.y += wave.x;
 
-    vec3 binormal = vec3(wave.y,0,0);
-    vec3 tangent = vec3(0,0,wave.z);
+    vec3 binormal = normalize(vec3(1,wave.y,0));
+    vec3 tangent = normalize(vec3(0,wave.z,1));
 
     vec3 normal = normalize(cross(binormal, tangent));
 
