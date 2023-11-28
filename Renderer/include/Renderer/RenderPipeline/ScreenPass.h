@@ -24,6 +24,9 @@ namespace renderer
 		int m_viewportHeight, m_viewportWidth;
 		graphics::Texture* m_colorTexture;
 		graphics::Texture* m_depthTexture;
+		graphics::Texture* m_shadowTexture;
+
+		glm::mat4 m_lightTransform;
 
 		unsigned int m_VAO, m_VBO, m_IBO;
 	};

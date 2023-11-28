@@ -19,7 +19,7 @@ out VS_OUT
 
 vec3 calculateHeight(vec3 position)
 {
-    vec3 output = vec3(0,0,0);
+    vec3 answer = vec3(0,0,0);
 
     float amplitude = 1.0f;
     float frequency = 0.3f;
@@ -36,10 +36,10 @@ vec3 calculateHeight(vec3 position)
         float dx = wave * cos(x);
 
 
-        output.x += wave;
+        answer.x += wave;
 
-        output.y += d.x * dx; 
-        output.z += d.y * dx;
+        answer.y += d.x * dx; 
+        answer.z += d.y * dx;
 
         p.xz += d * -dx * amplitude;
 
@@ -49,9 +49,9 @@ vec3 calculateHeight(vec3 position)
         amplitude *= 0.82f;
     }
 
-    output = output / amplitudeSum;
+    answer = answer / amplitudeSum;
 
-    return output * 0.5;
+    return answer * 0.5;
 }
 
 void main()

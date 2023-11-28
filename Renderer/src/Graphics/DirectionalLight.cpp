@@ -14,7 +14,7 @@ namespace graphics
 		if (castShadows)
 		{
 			m_shadowMap = new Texture(SHADOW_WIDTH, SHADOW_HEIGHT, 1);
-			m_projMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 100.0f);
+			m_projMatrix = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, 0.1f, 100.0f);
 
 			glGenFramebuffers(1, &m_shadowFBO);
 
