@@ -57,15 +57,12 @@ float shadowCalc(vec4 fragPosLightTransform)
 
 void main()
 {
-	vec3 normal = normalize(fs_in.frag_normal);
-	if(dot(normal, normalize(u_directionalLight.direction)) < 0)
-		normal = -normal;
 
 	float refraction_ratio = 1.00 / 1.33;
 	vec3 fragToEye = normalize(fs_in.frag_pos-u_cameraPos);
-	float fresnel = pow((1-max(dot(normal, fragToEye), 0.0f)), 1);
-	vec3 refractedRay = normalize(refract(fragToEye, -normal, refraction_ratio));
-	vec3 reflectedRay = normalize(reflect(fragToEye, -normal));
+	float fresnel = pow((1-max(dot(normalize(fs_in.frag_normal), fragToEye), 0.0f)), 1);
+	vec3 refractedRay = normalize(refract(fragToEye, -normalize(fs_in.frag_normal),refraction_ratio));
+	vec3 reflectedRay = normalize(reflect(fragToEye, -normalize(fs_in.frag_normal)));
 
 	vec3 refractionColor = texture(t_cubeMap, refractedRay).xyz;
 	vec3 reflectionColor = texture(t_cubeMap, reflectedRay).xyz;
@@ -75,11 +72,11 @@ void main()
 
 	vec4 ambientColor = vec4(u_directionalLight.base.color, 1.0) * u_directionalLight.base.ambientIntensity;
 
-	float diffuseFactor = max(dot(normal, normalize(u_directionalLight.direction)), 0.0f);
+	float diffuseFactor = max(dot(normalize(fs_in.frag_normal), normalize(u_directionalLight.direction)), 0.0f);
 	vec4 diffuseColor = vec4(u_directionalLight.base.color, 1.0f) *  u_directionalLight.base.diffuseIntensity * diffuseFactor;
 
 	fragToEye = normalize(u_cameraPos - fs_in.frag_pos);
-	vec3 reflected = normalize(reflect(u_directionalLight.direction, normal));
+	vec3 reflected = normalize(reflect(u_directionalLight.direction, normalize(fs_in.frag_normal)));
 	
 	vec4 specularColor = vec4(0,0,0,0);
 	float specularFactor = dot(fragToEye, reflected);

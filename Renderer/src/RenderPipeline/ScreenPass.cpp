@@ -4,7 +4,6 @@
 #include "Renderer/RenderPipeline/ColorPass.h"
 #include "Renderer/Graphics/ShaderManager.h"
 #include "Renderer/Graphics/Texture.h"
-#include "Renderer/Graphics/DirectionalLight.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -23,7 +22,6 @@ namespace renderer
 
 		m_colorTexture = nullptr;
 		m_depthTexture = nullptr;
-		m_shadowTexture = nullptr;
 
 		float vertices[] = {
 			-1, -1, 0, 0, 0,
@@ -78,21 +76,18 @@ namespace renderer
 
 		m_screenShader->setUnifromMat4f("u_view", m_scene->mainCamera->getViewMatrix());
 		m_screenShader->setUnifromMat4f("u_projection", m_scene->mainCamera->getProjectionMatrix());
-		m_screenShader->setUnifromMat4f("u_directionalLightTransform", glm::value_ptr(m_lightTransform));
 
 		m_screenShader->setUniformVec3("u_cameraPos", glm::value_ptr(m_scene->mainCamera->transform.position));
 
+		m_screenShader->setUniformFloat("m_halfScreenWidth", m_viewportWidth / 2);
+		m_screenShader->setUniformFloat("m_halfScreenHeight", m_viewportHeight / 2);
 		m_screenShader->setUniformFloat("m_near", 0.1f);
 		m_screenShader->setUniformFloat("m_far", 1000.0f);
 
-		m_screenShader->setUniformInt("t_mainTex", 0);
-		m_screenShader->setUniformInt("t_depthTex", 1);
-		m_screenShader->setUniformInt("t_shadowMapTex", 2);
 
+		m_screenShader->setUniformInt("t_depthTex", 1);
 		m_colorTexture->useTexture(0);
 		m_depthTexture->useTexture(1);
-		m_shadowTexture->useTexture(2);
-
 		m_renderer->render(m_VAO, 6);
 	}
 
@@ -107,9 +102,6 @@ namespace renderer
 		input->getOutputs((void*)&colorTextureRef);
 		m_colorTexture = colorTextureRef[0];
 		m_depthTexture = colorTextureRef[1];
-		m_shadowTexture = colorTextureRef[2];
-		graphics::DirectionalLight* light = ((graphics::DirectionalLight*)((void*)colorTextureRef[3]));
-		m_lightTransform = ((graphics::DirectionalLight*)((void*)colorTextureRef[3]))->getLightTransform();
 	}
 
 	void ScreenPass::getOutputs(void* inputStruct)

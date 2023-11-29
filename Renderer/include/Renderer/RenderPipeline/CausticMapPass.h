@@ -1,16 +1,19 @@
 #pragma once
 
 #include "RenderPass.h"
+#include "Renderer/Graphics/Texture.h"
 #include "Renderer/Graphics/Scene.h"
+
+#include <vector>
+
 
 namespace renderer
 {
 
-	class ScreenPass : public RenderPass
+	class CausticMapPass : public RenderPass
 	{
 	public:
-		ScreenPass(graphics::Scene* scene, Renderer* renderer, graphics::Shader* screenShader);
-		~ScreenPass();
+		CausticMapPass(graphics::Scene* scene, Renderer* renderer);
 
 		void preRender() override;
 		void render() override;
@@ -20,11 +23,11 @@ namespace renderer
 		void getOutputs(void* inputStruct) override;
 	private:
 		graphics::Scene* m_scene;
-		graphics::Shader* m_screenShader;
-		int m_viewportHeight, m_viewportWidth;
-		graphics::Texture* m_colorTexture;
+		graphics::Shader* m_causticMapShader;
+		graphics::Texture* m_causticTexture;
 		graphics::Texture* m_depthTexture;
-
-		unsigned int m_VAO, m_VBO, m_IBO;
+		unsigned int m_causticFBO;
+		glm::mat4 m_projection;
 	};
+
 }

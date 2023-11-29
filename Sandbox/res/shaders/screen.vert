@@ -4,9 +4,6 @@ layout (location = 1) in vec2 aTex;
 
 out vec2 frag_uv;
 
-uniform mat4 u_view;
-uniform mat4 u_projection;
-
 void main()
 {
     gl_Position = vec4(aPos, 1.0);

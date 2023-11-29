@@ -114,17 +114,5 @@ namespace renderer
 		std::vector<graphics::Texture*> *input = (std::vector<graphics::Texture*>*)inputStruct;
 		input->push_back(m_colorTexture);
 		input->push_back(m_depthTexture);
-		for (size_t i = 0; i < m_scene->lightList.size(); i++)
-		{
-			if (m_scene->lightList[i]->getType() == DIRECTIONAL_LIGHT)
-			{
-				graphics::DirectionalLight* light = (graphics::DirectionalLight*)m_scene->lightList[i];
-				if (m_shadowStruct.find(light) != m_shadowStruct.end())
-				{
-					input->push_back(m_shadowStruct[light]);
-					input->push_back((graphics::Texture*)((void*)light));
-				}
-			}
-		}
 	}
 }

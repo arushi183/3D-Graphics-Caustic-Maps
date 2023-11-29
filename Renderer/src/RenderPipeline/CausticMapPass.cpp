@@ -1,6 +1,6 @@
 #include "Renderer/Renderer.h"
 
-#include "Renderer/RenderPipeline/EnvironmentMapPass.h"
+#include "Renderer/RenderPipeline/CausticMapPass.h"
 #include "Renderer/Graphics/ShaderManager.h"
 
 #include <glad/glad.h>
@@ -8,36 +8,32 @@
 
 #include "Renderer/Graphics/DirectionalLight.h"
 
-namespace renderer
-{
-
-	EnvironmentMapPass::EnvironmentMapPass(graphics::Scene* scene, Renderer* renderer)
-		:RenderPass(renderer), m_scene(scene), m_environmentMapShader(nullptr)
+namespace renderer {
+	CausticMapPass::CausticMapPass(graphics::Scene* scene, Renderer* renderer)
+		:RenderPass(renderer), m_scene(scene), m_causticMapShader(nullptr)
 	{
-		//m_environmentMapShader = graphics::ShaderManager::getInstance()->loadShader("res/shaders/environmentmap.vert", "res/shaders/environmentmap.frag");
 		m_projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
 
-		m_environmentTexture = new graphics::Texture(720, 720, 3);
+		m_causticTexture = new graphics::Texture(720, 720, 3);
 		m_depthTexture = new graphics::Texture(720, 720, 1);
-		glGenFramebuffers(1, &m_environmentFBO);
+		glGenFramebuffers(1, &m_causticFBO);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, m_environmentFBO);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_environmentTexture->getTextureID(), 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_causticFBO);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_causticTexture->getTextureID(), 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture->getTextureID(), 0);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
-
-	void EnvironmentMapPass::preRender()
+	void CausticMapPass::preRender()
 	{
 		//m_environmentMapShader->bind();
 		glViewport(0, 0, 720, 720);
-		
-		glBindFramebuffer(GL_FRAMEBUFFER, m_environmentFBO);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
 
-	void EnvironmentMapPass::render()
+		glBindFramebuffer(GL_FRAMEBUFFER, m_causticFBO);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}	
+
+	void CausticMapPass::render()
 	{
 		glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
 		for (auto& set : m_scene->meshList)
@@ -66,29 +62,26 @@ namespace renderer
 
 				}
 			}
-
 			for (graphics::Renderable* mesh : set.second)
 			{
-				if (mesh->transform.position != glm::vec3(0.0, 0.0, 0.0) && (mesh->getMaterialRef()->passes & COLOR_PASS) != 0)
-					mesh->render(*m_renderer, shader);
+				
 			}
 		}
 	}
 
-	void EnvironmentMapPass::postRender()
+	void CausticMapPass::postRender()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void EnvironmentMapPass::setInputs(RenderPass* pass)
+	void CausticMapPass::setInputs(RenderPass* pass)
 	{
 	}
 
-	void EnvironmentMapPass::getOutputs(void* inputStruct)
+	void CausticMapPass::getOutputs(void* inputStruct)
 	{
 		std::vector<graphics::Texture*>* colorTextureRef = (std::vector<graphics::Texture*>*) inputStruct;
-		colorTextureRef->push_back(m_environmentTexture);
+		colorTextureRef->push_back(m_causticTexture);
 		colorTextureRef->push_back(m_depthTexture);
 	}
-
 }

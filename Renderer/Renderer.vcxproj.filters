@@ -114,6 +114,9 @@
     <ClInclude Include="include\Renderer\RenderPipeline\EnvironmentMapPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderer\RenderPipeline\CausticMapPass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Renderer.cpp">
@@ -183,6 +186,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderPipeline\EnvironmentMapPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderPipeline\CausticMapPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
