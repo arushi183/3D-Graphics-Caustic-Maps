@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Renderer\Graphics\CubeMapTexture.h" />
+    <ClInclude Include="include\Renderer\RenderPipeline\CausticMapPass.h" />
     <ClInclude Include="include\Renderer\RenderPipeline\CubeMapPass.h" />
     <ClInclude Include="include\Renderer\RenderPipeline\DirectionalShadowPass.h" />
     <ClInclude Include="include\Renderer\Graphics\DirectionalLight.h" />
@@ -19,7 +20,6 @@
     <ClInclude Include="include\Renderer\RenderPipeline\ColorPass.h" />
     <ClInclude Include="include\Renderer\Renderer.h" />
     <ClInclude Include="include\Renderer\RenderPipeline\EnvironmentMapPass.h" />
-    <ClInclude Include="include\Renderer\RenderPipeline\CausticMapPass.h" />
     <ClInclude Include="include\Renderer\Window\Input.h" />
     <ClInclude Include="include\Renderer\Window\KeyBindings.h" />
     <ClInclude Include="include\Renderer\Window\Window.h" />

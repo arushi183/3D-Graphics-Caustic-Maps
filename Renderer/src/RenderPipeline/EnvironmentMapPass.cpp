@@ -39,7 +39,21 @@ namespace renderer
 
 	void EnvironmentMapPass::render()
 	{
-		glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+			glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+			/*
+			for (auto& set : m_scene->meshList)
+			{
+				graphics::Shader* shader = set.first;
+				shader->bind();
+
+				shader->setUnifromMat4f("u_projection", glm::value_ptr(m_projection));
+				shader->setUnifromMat4f("u_view", glm::value_ptr(viewMatrix));
+				for (graphics::Renderable* mesh : set.second)
+				{
+					if (mesh->transform.position != glm::vec3(0.0, 0.0, 0.0) && (mesh->getMaterialRef()->passes & COLOR_PASS) != 0)
+						mesh->render(*m_renderer, shader);
+				}
+			}*/
 		for (auto& set : m_scene->meshList)
 		{
 			graphics::Shader* shader = set.first;

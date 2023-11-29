@@ -46,6 +46,8 @@ graphics::Model* createWaterPlane(graphics::Material* Watermaterial)
             unsigned int quad = y * resolution + x;
             ind.insert(ind.end(), { quad, quad + resolution, quad + resolution + 1 });
             ind.insert(ind.end(), { quad, quad + resolution + 1, quad + 1 });
+            ind.insert(ind.end(), { quad + resolution + 1, quad + resolution, quad });
+            ind.insert(ind.end(), { quad + 1, quad + resolution + 1, quad });
         }
     }
 
@@ -71,14 +73,14 @@ int main()
     }
 
     graphics::Shader* screenShader = graphics::ShaderManager::getInstance()->loadShader("res/shaders/screen.vert", "res/shaders/screen.frag");
-
+    graphics::Material m_causticMaterial(graphics::ShaderManager::getInstance()->loadShader("res/shaders/causticmap.vert", "res/shaders/causticmap.frag"),CAUSTIC_PASS);
     renderer::RenderPipeline pipeline;
-    //Environment Cube Pass
     pipeline.addPass(new renderer::EnvironmentMapPass(&mainScene, mainRenderer));
     pipeline.addPass(new renderer::CubeMapPass(&mainScene, mainRenderer));
     pipeline.addPass(new renderer::DirectionalShadowPass(&mainScene, mainRenderer));
     // Caustic Pass
-    //pipeline.addPass(new renderer::CausticMapPass(&mainScene, mainRenderer));
+    pipeline.addPass(new renderer::CausticMapPass(&mainScene, mainRenderer,&m_causticMaterial));
+    //renderer::CausticMapPass causticMapPass(&mainScene, mainRenderer);
     pipeline.addPass(new renderer::ColorPass(&mainScene, mainRenderer));
     pipeline.addPass(new renderer::ScreenPass(&mainScene, mainRenderer, screenShader));
     
@@ -87,7 +89,7 @@ int main()
     
     graphics::DirectionalLight* sun = new graphics::DirectionalLight(true);
     sun->color = { 1.0f, 0.96f, 0.83f };
-    sun->transform.rotation = { 145.0f, 0.0f, 0.0f };
+    sun->transform.rotation = { 160.0f, 0.0f, 0.0f };
     sun->transform.position = { 0.0f, 10.0f, 10.0f };
     sun->ambientIntensity = 0.5f;
     sun->diffuseIntensity = 1.0f;
@@ -105,15 +107,17 @@ int main()
         int loc = i / 3;
         uniforms[loc] = "u_wave[" + std::to_string(loc) + "]";
         waterMaterial.setParamVec3(uniforms[loc].c_str(), &WaveDir[i]);
+        m_causticMaterial.setParamVec3(uniforms[loc].c_str(), &WaveDir[i]);
     }
 
     waterMaterial.setParamFloat("u_time", time);
+    m_causticMaterial.setParamFloat("u_time", time);
     graphics::Model* water = createWaterPlane(&waterMaterial);
     water->transform.position = { 0,0,0 };
     water->transform.scale = { 50,50,50 };
 
     graphics::Model* sphere = new graphics::Model("res/models/sphere.fbx");
-    sphere->transform.position = { 0,10,0 };
+    sphere->transform.position = { 0,5,0 };
 
     graphics::Model* underwater = new graphics::Model("res/models/underwater.glb");
     underwater->transform.rotation = { 90,0,0 };
@@ -133,11 +137,11 @@ int main()
         pipeline.renderPipeline();
 
         float deltaTime = mainWindow->getInputs()->getDeltaTime();
-        rot += deltaTime * 50.0f;
+        rot += deltaTime * 2.0f;
         time += deltaTime * 2.0f;
         if (rot >= 360)
             rot -= 360;
-        sun->transform.rotation = { 145, rot, 0 };
+        sun->transform.rotation = { 160.0f, rot, 0 };
         waterMaterial.setParamFloat("u_time", time);
 
         mainScene.handleInput(mainWindow->getInputs());

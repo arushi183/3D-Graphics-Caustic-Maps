@@ -11,6 +11,7 @@ namespace graphics
 #define SHADOW_PASS 1
 #define COLOR_PASS 2
 #define CUBEMAP_PASS 4
+#define CAUSTIC_PASS 8
 
 	struct Material
 	{

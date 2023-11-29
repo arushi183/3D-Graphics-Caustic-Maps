@@ -166,6 +166,10 @@
       <Project>{6154a5cc-7cfa-48be-bcb1-950589e4f026}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\shaders\causticmap.frag" />
+    <None Include="res\shaders\causticmap.vert" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
