@@ -18,7 +18,7 @@
     <ClInclude Include="include\Renderer\Graphics\Camera.h" />
     <ClInclude Include="include\Renderer\RenderPipeline\ColorPass.h" />
     <ClInclude Include="include\Renderer\Renderer.h" />
-    <ClInclude Include="include\Renderer\RenderPipeline\EnvironmentMapPass.h" />
+    <ClInclude Include="include\Renderer\RenderPipeline\CausticMapPass.h" />
     <ClInclude Include="include\Renderer\Window\Input.h" />
     <ClInclude Include="include\Renderer\Window\KeyBindings.h" />
     <ClInclude Include="include\Renderer\Window\Window.h" />
@@ -42,7 +42,7 @@
     <ClCompile Include="src\Graphics\CubeMapTexture.cpp" />
     <ClCompile Include="src\RenderPipeline\CubeMapPass.cpp" />
     <ClCompile Include="src\Graphics\Material.cpp" />
-    <ClCompile Include="src\RenderPipeline\EnvironmentMapPass.cpp" />
+    <ClCompile Include="src\RenderPipeline\CausticMapPass.cpp" />
     <ClCompile Include="src\RenderPipeline\ScreenPass.cpp" />
     <ClCompile Include="src\RenderPipeline\DirectionalShadowPass.cpp" />
     <ClCompile Include="src\Graphics\DirectionalLight.cpp" />

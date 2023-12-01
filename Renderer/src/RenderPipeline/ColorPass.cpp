@@ -16,10 +16,7 @@ namespace renderer
 		:RenderPass(renderer), m_scene(scene)
 	{
 		m_lineShader = graphics::ShaderManager::getInstance()->loadShader("res/shaders/unshaded.vert", "res/shaders/unshaded.frag");
-		GLint m_viewport[4];
-		glGetIntegerv(GL_VIEWPORT, m_viewport);
-		m_viewportWidth = m_viewport[2];
-		m_viewportHeight = m_viewport[3];
+		renderer->getUpdatedWindow(m_viewportWidth, m_viewportHeight);
 
 		m_colorTexture = new graphics::Texture(m_viewportWidth, m_viewportHeight, 3);
 		m_depthTexture = new graphics::Texture(m_viewportWidth, m_viewportHeight, 1);
@@ -44,6 +41,7 @@ namespace renderer
 
 	void ColorPass::preRender()
 	{
+		m_renderer->getUpdatedWindow(m_viewportWidth, m_viewportHeight);
 		glViewport(0, 0, m_viewportWidth, m_viewportHeight);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_ColorFBO);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

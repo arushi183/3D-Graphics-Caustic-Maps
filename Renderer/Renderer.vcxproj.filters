@@ -111,7 +111,7 @@
     <ClInclude Include="include\Renderer\Graphics\CubeMapTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\RenderPipeline\EnvironmentMapPass.h">
+    <ClInclude Include="include\Renderer\RenderPipeline\CausticMapPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -182,7 +182,7 @@
     <ClCompile Include="src\Graphics\CubeMapTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderPipeline\EnvironmentMapPass.cpp">
+    <ClCompile Include="src\RenderPipeline\CausticMapPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

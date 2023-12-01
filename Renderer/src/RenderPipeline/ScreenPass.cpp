@@ -24,6 +24,7 @@ namespace renderer
 		m_colorTexture = nullptr;
 		m_depthTexture = nullptr;
 		m_shadowTexture = nullptr;
+		m_causticTexture = nullptr;
 
 		float vertices[] = {
 			-1, -1, 0, 0, 0,
@@ -79,6 +80,21 @@ namespace renderer
 		m_screenShader->setUnifromMat4f("u_view", m_scene->mainCamera->getViewMatrix());
 		m_screenShader->setUnifromMat4f("u_projection", m_scene->mainCamera->getProjectionMatrix());
 		m_screenShader->setUnifromMat4f("u_directionalLightTransform", glm::value_ptr(m_lightTransform));
+		if (m_causticTexture == nullptr) {
+			for (auto& set : m_scene->meshList)
+			{
+				for (auto& mesh : set.second)
+				{
+					if ((mesh->getMaterialRef()->passes & CAUSTIC_PASS) != 0)
+					{
+						m_causticTexture = mesh->getMaterialRef()->causticMap;
+						m_causticTransform = glm::make_mat4x4(mesh->getMaterialRef()->causticProj) * glm::make_mat4x4(mesh->getMaterialRef()->causticView);
+						break;
+					}
+				}
+			}
+		}
+		m_screenShader->setUnifromMat4f("u_causticTransform", glm::value_ptr(m_causticTransform));
 
 		m_screenShader->setUniformVec3("u_cameraPos", glm::value_ptr(m_scene->mainCamera->transform.position));
 
@@ -88,10 +104,12 @@ namespace renderer
 		m_screenShader->setUniformInt("t_mainTex", 0);
 		m_screenShader->setUniformInt("t_depthTex", 1);
 		m_screenShader->setUniformInt("t_shadowMapTex", 2);
+		m_screenShader->setUniformInt("t_causticTex", 3);
 
 		m_colorTexture->useTexture(0);
 		m_depthTexture->useTexture(1);
 		m_shadowTexture->useTexture(2);
+		m_causticTexture->useTexture(3);
 
 		m_renderer->render(m_VAO, 6);
 	}

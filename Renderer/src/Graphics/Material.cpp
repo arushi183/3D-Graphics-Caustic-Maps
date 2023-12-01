@@ -6,7 +6,7 @@ namespace graphics
 {
 
 	Material::Material(Shader* shader, unsigned int pass)
-		:cubeMapTexture(nullptr), CubeMapFBO(0), m_RBO(0)
+		:cubeMapTexture(nullptr), CubeMapFBO(0), m_RBO(0), causticMap(nullptr)
 	{
 		this->passes = pass;
 		if (shader == nullptr)
@@ -54,11 +54,28 @@ namespace graphics
 			overrideShader->setUniformVec3(e.first, e.second);
 		for (auto& e : m_uniforms_Vec4)
 			overrideShader->setUniformVec4(e.first, e.second);
-		if ((passes & CUBEMAP_PASS) != 0)
+		for (auto& e : m_uniforms_Mat4)
+			overrideShader->setUnifromMat4f(e.first, e.second);
+		
+		if (cubeMapTexture != nullptr)
 		{
 			overrideShader->setUniformInt("t_cubeMap", 3);
 			cubeMapTexture->useTexture(3);
 		}
+		else if (causticMap != nullptr)
+		{
+			overrideShader->setUniformInt("t_causticTexture", 3);
+			causticMap->useTexture(3);
+		}
+	}
+
+	void Material::setCausticTexture(Texture* caustic, float* causticProj, float* causticView)
+	{
+		causticMap = caustic;
+		this->causticView = causticView;
+		this->causticProj = causticProj;
+		setParamMat4("u_causticView", causticView);
+		setParamMat4("u_causticProj", causticProj);
 	}
 
 	bool Material::setParamInt(const char* uniform, int value)
@@ -94,6 +111,12 @@ namespace graphics
 	bool Material::setParamVec4(const char* uniform, const float* value)
 	{
 		m_uniforms_Vec4[uniform] = value;
+		return true;
+	}
+
+	bool Material::setParamMat4(const char* uniform, const float* value)
+	{
+		m_uniforms_Mat4[uniform] = value;
 		return true;
 	}
 

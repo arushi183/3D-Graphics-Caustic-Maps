@@ -22,7 +22,7 @@ namespace renderer
 	{
 		for (int i = 0; i < m_passes.size(); i++)
 		{
-			if (i > 1)
+			if (i > 0)
 				m_passes[i]->setInputs(m_passes[i - 1]);
 			m_passes[i]->preRender();
 			m_passes[i]->render();

@@ -100,7 +100,7 @@ namespace renderer
 
 	void CubeMapPass::setInputs(RenderPass* pass)
 	{
-
+		pass->getOutputs(nullptr);
 	}
 
 	void CubeMapPass::getOutputs(void* inputStruct)

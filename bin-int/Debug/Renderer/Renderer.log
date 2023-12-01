@@ -1,5 +1,18 @@
 ﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(502,5): warning MSB8004: Intermediate Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Intermediate Directory.
 C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(503,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
-  EnvironmentMapPass.cpp
+  Camera.cpp
+  DirectionalLight.cpp
+  Mesh.cpp
+D:\Projects\3D-Graphics-Caustic-Maps\Renderer\src\Graphics\Mesh.cpp(30,134): warning C4312: 'type cast': conversion from 'unsigned int' to 'void *' of greater size
+  Scene.cpp
+  CausticMapPass.cpp
+D:\Projects\3D-Graphics-Caustic-Maps\Renderer\src\RenderPipeline\CausticMapPass.cpp(65,124): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  ColorPass.cpp
+  CubeMapPass.cpp
+  DirectionalShadowPass.cpp
+  ScreenPass.cpp
+  Renderer.cpp
+  Window.cpp
+  Generating Code...
 assimp.lib(assimp-vc142-mt.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in opengl32.lib(OPENGL32.dll); second definition ignored
   Renderer.vcxproj -> D:\Projects\3D-Graphics-Caustic-Maps\bin\Debug\Renderer\Renderer.lib

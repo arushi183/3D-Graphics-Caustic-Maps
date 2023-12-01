@@ -27,8 +27,8 @@ namespace renderer
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
 
-		//glEnable(GL_LINE_WIDTH);
-		//glLineWidth(2); 
+		glEnable(GL_LINE_WIDTH);
+		glLineWidth(2); 
 	}
 
 	Renderer::~Renderer()
@@ -47,6 +47,12 @@ namespace renderer
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_LINES, 0, elementCount);
 		glBindVertexArray(0);
+	}
+
+	void Renderer::getUpdatedWindow(int& width, int& height)
+	{
+		width = m_framebuffer_width;
+		height = m_framebuffer_height;
 	}
 
 	void Renderer::updateFrameBufferResolution(unsigned int width, unsigned int height)

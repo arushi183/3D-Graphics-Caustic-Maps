@@ -12,6 +12,8 @@ namespace renderer
 
         void render(unsigned int VAO, int elementCount);
         void renderLine(unsigned int VAO, int elementCount);
+
+        void getUpdatedWindow(int& width, int& height);
     private:
         int m_framebuffer_width, m_framebuffer_height;
 

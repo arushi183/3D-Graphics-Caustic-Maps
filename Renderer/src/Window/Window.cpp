@@ -44,6 +44,42 @@ namespace window
 		glfwSetScrollCallback(m_window, window_scroll_callback);
 	}
 
+	Window::Window(const char* title)
+		:m_window(nullptr), m_inputs(nullptr)
+	{
+		if (!glfwInit())
+			return;
+
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		m_width = mode->width;
+		m_height = mode->height;
+		m_window = glfwCreateWindow(mode->width, mode->height, title, glfwGetPrimaryMonitor(), nullptr);
+		if (m_window == nullptr)
+		{
+			printf("Failed to create GLFW\n");
+			glfwTerminate();
+			return;
+		}
+
+		glfwMakeContextCurrent(m_window);
+		glfwSetWindowUserPointer(m_window, this);
+
+		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+		m_inputs = new Input();
+
+		//Callbacks
+		glfwSetWindowSizeCallback(m_window, window_size_callback);
+		glfwSetCursorPosCallback(m_window, window_cursor_pos_callback);
+		glfwSetKeyCallback(m_window, window_key_callback);
+		glfwSetMouseButtonCallback(m_window, window_mouse_button_callback);
+		glfwSetScrollCallback(m_window, window_scroll_callback);
+	}
+
 	Window::~Window()
 	{
 		delete(m_inputs);

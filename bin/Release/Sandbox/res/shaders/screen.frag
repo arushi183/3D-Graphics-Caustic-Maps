@@ -6,15 +6,25 @@ in vec2 frag_uv;
 uniform sampler2D t_mainTex;
 uniform sampler2D t_depthTex;
 uniform sampler2D t_shadowMapTex;
+uniform sampler2D t_causticTex;
 
 uniform mat4 u_view;
 uniform mat4 u_projection;
 uniform mat4 u_directionalLightTransform;
+uniform mat4 u_causticTransform;
 
 uniform float m_near;
 uniform float m_far;
 
 uniform vec3 u_cameraPos;
+
+float causticCalc(vec4 fragPosCaustic)
+{
+	vec3 projCoords = fragPosCaustic.xyz/ fragPosCaustic.w;
+	projCoords = (projCoords * 0.5) + 0.5;
+
+	return texture(t_causticTex, projCoords.xy).r; 
+}
 
 float shadowCalc(vec4 fragPosLightTransform)
 {
@@ -69,10 +79,15 @@ vec3 getRay(vec2 pos)
 	return normalize(ray_wor);
 }
 
-float sampleDensity(vec3 position)
+float sampleShadow(vec3 position)
 {
 	float shadowFactor = shadowCalc(u_directionalLightTransform * vec4(position, 1.0));
 	return (1 - shadowFactor);
+}
+
+float sampleCaustic(vec3 position)
+{
+	return causticCalc(u_causticTransform * vec4(position, 1.0)) * 0.9f;
 }
 
 void main()
@@ -97,18 +112,29 @@ void main()
 
 	float totalDensity = 0;
 	vec3 underwaterColor = vec3(0.000, 0.533, 0.666);
+	vec3 shadow = vec3(0.0, 0.0, 0.0);
+	vec3 light = vec3(1.2, 1.16, 1.03);
 	int steps = 1;
+
+	float avgShadow = 0.0;
+	float avgCaustic = 0.0;
+
 	while(dstTravelled < dstLimit)
 	{
 		vec3 rayPos = rayOrigin + rayDir * (dstToBox + dstTravelled);
-		float shadowFactor = sampleDensity(rayPos);
-		underwaterColor += mix(vec3(0.0, 0.0, 0.0), vec3(0.000, 0.533, 0.666), shadowFactor);
+		avgShadow += sampleShadow(rayPos);
+		avgCaustic += sampleCaustic(rayPos);
+
 		totalDensity += 0.06 * stepSize;
 		dstTravelled += stepSize;
 		steps += 1;
 	}
 	
-	underwaterColor /= steps;
+	avgShadow /= steps;
+	avgCaustic /= steps;
+
+	underwaterColor = mix(shadow, underwaterColor, avgShadow);
+	underwaterColor = mix(underwaterColor, light, avgCaustic);
 
 	float transmittance = exp(-totalDensity);
 

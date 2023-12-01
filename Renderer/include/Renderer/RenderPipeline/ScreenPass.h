@@ -25,8 +25,10 @@ namespace renderer
 		graphics::Texture* m_colorTexture;
 		graphics::Texture* m_depthTexture;
 		graphics::Texture* m_shadowTexture;
+		graphics::Texture* m_causticTexture;
 
 		glm::mat4 m_lightTransform;
+		glm::mat4 m_causticTransform;
 
 		unsigned int m_VAO, m_VBO, m_IBO;
 	};
